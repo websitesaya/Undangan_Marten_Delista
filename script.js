@@ -4,7 +4,7 @@
    2. Buat bin baru, isi konten awal dengan: []
    3. Salin "Bin ID" dan "X-Master-Key" ke bawah ini
 ========================================================= */
-const JSONBIN_BIN_ID  = "6a7c7e39da38895dfedadb74";
+const JSONBIN_BIN_ID  = "6b041a1cffd5d16053d76710";
 const JSONBIN_API_KEY = "$2a$10$nou5c3yZntdxwBqnGEEOvuCkZpg9GT4CfSp1IXgNhJpKQzhxI8NYO";
 const JSONBIN_URL     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
