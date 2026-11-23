@@ -191,7 +191,7 @@ function updateCountdown(){
 
 /* ================= GALERI FOTO ================= */
 const galleryGrid = document.getElementById('gallery-grid');
-const totalFoto = 10;
+const totalFoto = 8;
 const fotoList = [];
 for(let i=1;i<=totalFoto;i++){
   fotoList.push(`Foto${i}.jpg`);
@@ -234,7 +234,7 @@ document.querySelectorAll('.btn-copy').forEach(btn => {
   btn.addEventListener('click', () => {
     navigator.clipboard.writeText(btn.dataset.copy).then(() => {
       const original = btn.textContent;
-      btn.textContent = 'Tersalin!';
+      btn.textContent = 'Tersalin ✓';
       setTimeout(() => btn.textContent = original, 1500);
     });
   });
@@ -351,3 +351,59 @@ btnKirim.addEventListener('click', async () => {
 });
 
 ambilUcapan();
+
+/* ================= ANIMASI MUNCUL SAAT SCROLL ================= */
+(function initScrollReveal(){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if(!('IntersectionObserver' in window)) return;
+
+  // [selector, jenis animasi, jeda antar elemen (detik)]
+  const rules = [
+    ['#hero .opening-eyebrow','up',0],
+    ['#hero .opening-names','zoom',0.15],
+    ['#hero .verse','up',0.35],
+    ['#hero .countdown > div','zoom',0.1,0.5],
+    ['#hero .scroll-hint','fade',0,1.1],
+    ['#quote p','zoom',0],
+    ['#quote .ref','up',0.2],
+    ['.section-title','up',0],
+    ['.section-heading','up',0.1],
+    ['.divider','zoom',0.2],
+    ['.couple-card','alt',0],
+    ['.couple-amp','zoom',0],
+    ['.timeline-item','right',0.15],
+    ['.event-card','up',0.18],
+    ['.gallery-grid img','zoom',0.12],
+    ['#hadiah .container > p','up',0.1],
+    ['.atm-wrap','flip',0.2],
+    ['.form-box','up',0],
+    ['.ucapan-list','up',0.1],
+    ['footer .script','zoom',0],
+    ['footer .ornament-line','fade',0.1],
+    ['footer small','up',0.15],
+    ['.footer-logo','zoom',0.1],
+    ['.credit','up',0.1]
+  ];
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if(!en.isIntersecting) return;
+      const el = en.target;
+      io.unobserve(el);
+      el.classList.add('in');
+      const total = (parseFloat(el.style.getPropertyValue('--d')) || 0) * 1000 + 1100;
+      // setelah animasi selesai, lepas kelas supaya efek hover normal kembali
+      setTimeout(() => el.classList.remove('reveal','in','r-up','r-left','r-right','r-zoom','r-flip','r-fade'), total);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+
+  rules.forEach(([sel, type, step, base]) => {
+    document.querySelectorAll(sel).forEach((el, i) => {
+      const t = (type === 'alt') ? (i % 2 === 0 ? 'left' : 'right') : type;
+      el.classList.add('reveal', 'r-' + t);
+      const delay = (base || 0) + (step || 0) * (sel.includes('gallery') ? (i % 2) : i);
+      el.style.setProperty('--d', delay.toFixed(2) + 's');
+      io.observe(el);
+    });
+  });
+})();

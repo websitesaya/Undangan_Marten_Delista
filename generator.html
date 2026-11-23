@@ -3,79 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator Link Undangan</title>
+<title>Generator Link Undangan — Marten &amp; Delista</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  body{background:var(--maroon-deep);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:30px 16px}
+  body{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;background:linear-gradient(160deg,#b8707d,#9a5568 55%,#7e4156);background-attachment:fixed}
   .gen-box{
-    background:var(--cream);max-width:460px;width:100%;border-radius:14px;padding:36px 30px;
-    border:1px solid var(--gold);box-shadow:var(--shadow);
+    background:var(--cream);max-width:520px;width:100%;border-radius:20px;padding:34px 28px;
+    border:1px solid #f1cfcb;box-shadow:var(--shadow);
   }
-  .gen-box h1{font-size:26px;color:var(--maroon-deep);text-align:center;margin-bottom:6px}
-  .gen-box p.sub{text-align:center;color:#7a5b48;font-size:16px;margin-bottom:26px}
-  .gen-box input{
-    width:100%;padding:13px 14px;border:1px solid #d9c8a8;border-radius:6px;
-    font-family:'Cormorant Garamond',serif;font-size:17px;margin-bottom:14px;background:#fff;
+  .gen-box h1{font-size:27px;text-align:center;margin-bottom:4px;
+    background:linear-gradient(135deg,#8c4455,#c27d86,#8c4455);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .gen-box p.sub{text-align:center;color:#8a5a66;font-size:17px;margin-bottom:24px}
+  .gen-box label{display:block;font-family:'Playfair Display',serif;font-size:14px;color:#8c4455;margin:0 0 6px;letter-spacing:.5px}
+  .gen-box input,.gen-box textarea{
+    width:100%;padding:12px 14px;border:1px solid #ebc4c4;border-radius:10px;
+    font-family:'Cormorant Garamond',serif;font-size:17px;margin-bottom:16px;background:#fff;color:var(--ink);
   }
-  .gen-box button{
-    width:100%;background:var(--maroon);color:#fff;border:none;padding:13px;border-radius:6px;
+  .gen-box textarea{min-height:230px;resize:vertical;line-height:1.5}
+  .gen-box input:focus,.gen-box textarea:focus{outline:none;border-color:#c27d86;box-shadow:0 0 0 3px rgba(194,125,134,.18)}
+  .hint{font-size:13.5px;color:#a8707c;margin:-10px 0 16px;line-height:1.5}
+  .btn{
+    width:100%;background:linear-gradient(135deg,#d99a9f,#b76e79 60%,#a45a69);color:#fff;border:none;padding:13px;border-radius:30px;
     font-family:'Playfair Display',serif;letter-spacing:1px;font-size:15px;cursor:pointer;margin-bottom:10px;
   }
-  .gen-box button:hover{background:var(--maroon-deep)}
-  .result{
-    margin-top:18px;background:#fff;border:1px dashed var(--gold);border-radius:8px;padding:16px;
-    display:none;word-break:break-all;font-size:15px;color:var(--ink);
-  }
+  .btn:hover{filter:brightness(1.07)}
+  .btn-light{background:#fff;color:#a4566a;border:1px solid #e3a9a6}
+  .btn-wa{background:linear-gradient(135deg,#3fb868,#2f8f4e) !important}
+  .warn{background:#fff3e0;border:1px solid #f0c987;color:#8a5a1c;border-radius:10px;padding:10px 14px;font-size:15px;margin-bottom:16px;display:none;line-height:1.5}
+  .warn.show{display:block}
+  .result{margin-top:20px;background:#fff;border:1px dashed #d99a9f;border-radius:12px;padding:16px;display:none}
   .result.show{display:block}
-  .result .actions{display:flex;gap:8px;margin-top:12px}
-  .result .actions button{margin-bottom:0;font-size:14px;padding:10px}
-  .btn-wa{background:#2f8f4e !important}
-  .btn-wa:hover{background:#256e3b !important}
-  .note{font-size:13px;color:#9c7d5f;text-align:center;margin-top:22px;line-height:1.6}
+  .result .lbl{font-family:'Playfair Display',serif;font-size:13px;color:#8c4455;margin-bottom:6px;letter-spacing:.5px}
+  #link-output{word-break:break-all;font-size:16px;color:#4a2a30;margin-bottom:14px;background:#fdf4f2;padding:10px 12px;border-radius:8px}
+  #msg-preview{white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;font-size:16px;line-height:1.5;color:#4a2a30;background:#e7f7e9;border-radius:12px;padding:12px 14px;margin-bottom:14px}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .actions .btn{margin-bottom:0;font-size:14px;padding:11px}
+  .actions .full{grid-column:1/-1}
+  .note{font-size:13.5px;color:#a8707c;text-align:center;margin-top:22px;line-height:1.6}
 </style>
 </head>
 <body>
   <div class="gen-box">
     <h1>Generator Link Undangan</h1>
-    <p class="sub">Buat link undangan personal untuk tiap tamu</p>
+    <p class="sub">Buat link &amp; pesan undangan personal untuk tiap tamu</p>
 
-    <input type="text" id="nama-tamu" placeholder="Nama tamu, mis. Bpk. Nama Tamu">
-    <button id="btn-generate">Buat Link</button>
+    <div class="warn" id="warn"></div>
+
+    <label for="base-url">Alamat website undangan</label>
+    <input type="url" id="base-url" placeholder="https://namaanda.github.io/nama-repo/" inputmode="url">
+    <p class="hint">Isi dengan alamat undangan yang sudah online (yang bisa dibuka di browser). Kalau halaman ini dibuka dari website undangan, alamat terisi otomatis.</p>
+
+    <label for="nama-tamu">Nama tamu</label>
+    <input type="text" id="nama-tamu" placeholder="Contoh: Bpk. Yohanes &amp; Keluarga">
+
+    <label for="no-wa">Nomor WhatsApp tamu (opsional)</label>
+    <input type="tel" id="no-wa" placeholder="Contoh: 081234567890" inputmode="tel">
+
+    <label for="template">Template pesan (boleh diubah)</label>
+    <textarea id="template"></textarea>
+    <p class="hint">Gunakan <b>{nama}</b> untuk nama tamu dan <b>{link}</b> untuk link undangan.</p>
+
+    <button class="btn" id="btn-generate">Buat Link &amp; Pesan</button>
 
     <div class="result" id="result">
+      <div class="lbl">LINK UNDANGAN</div>
       <div id="link-output"></div>
+      <div class="lbl">PRATINJAU PESAN</div>
+      <div id="msg-preview"></div>
       <div class="actions">
-        <button id="btn-copy-link">Salin Link</button>
-        <button id="btn-wa" class="btn-wa">Bagikan via WhatsApp</button>
+        <button class="btn btn-light" id="btn-copy-link">Salin Link</button>
+        <button class="btn btn-light" id="btn-copy-msg">Salin Pesan</button>
+        <button class="btn btn-wa full" id="btn-wa">Kirim via WhatsApp</button>
+        <button class="btn btn-light full" id="btn-test">Tes Buka Link Undangan</button>
       </div>
     </div>
 
-    <p class="note">Tulis nama tamu, lalu klik "Buat Link". Link undangan personal beserta nama tamu akan otomatis dibuat dari alamat website undangan Anda.</p>
+    <p class="note">Pesan lengkap (beserta link) akan otomatis terisi di WhatsApp, tinggal tekan kirim.</p>
   </div>
 
 <script>
-const BASE_URL = 'https://websitesaya.github.io/Undangan_Marten-Delista/';
+const DEFAULT_TEMPLATE =
+`Yth. Bapak/Ibu/Saudara/i *{nama}*
 
-document.getElementById('btn-generate').addEventListener('click', () => {
-  const nama = document.getElementById('nama-tamu').value.trim();
-  if(!nama){ alert('Mohon isi nama tamu.'); return; }
+Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di acara pernikahan kami:
 
-  const sep = BASE_URL.includes('?') ? '&' : '?';
-  const link = `${BASE_URL}${sep}to=${encodeURIComponent(nama)}`;
+💍 *Marten & Delista*
+📅 Senin, 30 November 2026
+⛪ Pemberkatan: 09.00 WIT, Gereja Siloam Balisosang
+🏡 Resepsi: 12.00 WIT, Kediaman Mempelai Pria, Desa Balisosang, Kec. Malifut, Kab. Halmahera Utara
 
-  document.getElementById('link-output').textContent = link;
-  document.getElementById('result').classList.add('show');
+Berikut link undangan kami:
+{link}
 
-  document.getElementById('btn-copy-link').onclick = () => {
-    navigator.clipboard.writeText(link);
-    document.getElementById('btn-copy-link').textContent = 'Tersalin!';
-    setTimeout(()=>document.getElementById('btn-copy-link').textContent='Salin Link',1500);
-  };
+Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.
 
-  document.getElementById('btn-wa').onclick = () => {
-    const teks = `Yth. Bapak/Ibu/Saudara/i *${nama}*%0A%0ATanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir di acara pernikahan kami.%0A%0ABerikut link undangan kami:%0A${encodeURIComponent(link)}%0A%0ATerima kasih atas doa dan restunya 🙏`;
-    window.open(`https://wa.me/?text=${teks}`, '_blank');
-  };
+Terima kasih 🙏
+Marten & Delista`;
+
+const $ = id => document.getElementById(id);
+const baseInput = $('base-url'), tplInput = $('template');
+const KEY_BASE = 'gen_base_url', KEY_TPL = 'gen_template_v1';
+
+/* ---- Deteksi alamat website otomatis (bila halaman ini dibuka dari website undangan) ---- */
+function detectBase(){
+  if(location.protocol === 'http:' || location.protocol === 'https:'){
+    return location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/, '');
+  }
+  return '';
+}
+function safeGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function safeSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+baseInput.value = detectBase() || safeGet(KEY_BASE) || '';
+tplInput.value  = safeGet(KEY_TPL) || DEFAULT_TEMPLATE;
+
+if(!detectBase()){
+  const w = $('warn');
+  w.textContent = 'Halaman ini dibuka dari komputer/HP (bukan dari website), jadi alamat website undangan harus diisi manual di kolom pertama. Pastikan alamat itu bisa dibuka di browser, kalau tidak link akan menjadi "404 Not Found".';
+  w.classList.add('show');
+}
+
+function normalizeBase(u){
+  u = (u || '').trim();
+  if(!u) return '';
+  if(!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  u = u.split('#')[0].split('?')[0];
+  u = u.replace(/index\.html$/i, '').replace(/generator\.html$/i, '');
+  if(!u.endsWith('/')) u += '/';
+  return u;
+}
+function normalizePhone(p){
+  p = (p || '').replace(/[^\d]/g, '');
+  if(!p) return '';
+  if(p.startsWith('0')) p = '62' + p.slice(1);
+  else if(p.startsWith('8')) p = '62' + p;
+  return p;
+}
+
+let current = { link:'', pesan:'', phone:'' };
+
+$('btn-generate').addEventListener('click', () => {
+  const nama = $('nama-tamu').value.trim();
+  const base = normalizeBase(baseInput.value);
+  if(!base){ alert('Mohon isi alamat website undangan terlebih dahulu.'); baseInput.focus(); return; }
+  if(!nama){ alert('Mohon isi nama tamu.'); $('nama-tamu').focus(); return; }
+
+  baseInput.value = base;
+  safeSet(KEY_BASE, base);
+  safeSet(KEY_TPL, tplInput.value);
+
+  const link = `${base}?to=${encodeURIComponent(nama)}`;
+  let tpl = tplInput.value.trim() || DEFAULT_TEMPLATE;
+  if(!tpl.includes('{link}')) tpl += '\n\n{link}';
+  const pesan = tpl.split('{nama}').join(nama).split('{link}').join(link);
+
+  current = { link, pesan, phone: normalizePhone($('no-wa').value) };
+  $('link-output').textContent = link;
+  $('msg-preview').textContent = pesan;
+  $('result').classList.add('show');
+  $('result').scrollIntoView({behavior:'smooth', block:'nearest'});
+});
+
+function copyText(text, btn){
+  const done = () => { const o = btn.textContent; btn.textContent = 'Tersalin ✓'; setTimeout(() => btn.textContent = o, 1500); };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  }else{
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){ alert('Gagal menyalin, silakan salin manual.'); }
+  document.body.removeChild(ta);
+}
+
+$('btn-copy-link').addEventListener('click', e => copyText(current.link, e.target));
+$('btn-copy-msg').addEventListener('click',  e => copyText(current.pesan, e.target));
+$('btn-test').addEventListener('click', () => window.open(current.link, '_blank'));
+
+$('btn-wa').addEventListener('click', () => {
+  // Seluruh pesan di-encode SEKALI (termasuk baris baru), sehingga teks + link ikut terkirim
+  const text = encodeURIComponent(current.pesan);
+  const url = current.phone
+    ? `https://wa.me/${current.phone}?text=${text}`
+    : `https://api.whatsapp.com/send?text=${text}`;
+  window.open(url, '_blank');
 });
 </script>
 </body>
